@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/sand"
+    android:padding="10dp"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/sand"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:text="@string/sign_up"
+            android:textSize="35sp"
+            android:gravity="center"
+
+            />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:theme="@style/EditTheme"
+            android:textColor="@color/dark_grass_green"
+            android:id="@+id/signup_name"
+            android:hint="Name"
+            />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:theme="@style/EditTheme"
+            android:textColor="@color/dark_grass_green"
+            android:id="@+id/signup_username_email"
+            android:hint="@string/username_email"
+            />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:textColor="@color/dark_grass_green"
+            android:theme="@style/EditTheme"
+            android:inputType="textPassword"
+            android:id="@+id/signup_password"
+            android:hint="@string/password"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:textColor="@color/dark_grass_green"
+            android:theme="@style/EditTheme"
+            android:inputType="textPassword"
+            android:id="@+id/sign_up_confirm_password"
+            android:hint="Confirm Password"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal">
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:background="#FF5555"
+                android:id="@+id/signup_cancel_button"
+                android:text="Cancel"/>
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:textColor="@color/white"
+                android:background="@color/colorPrimaryDark"
+                android:layout_weight="1"
+                android:id="@+id/signup_signup_button"
+                android:text="@string/sign_up"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

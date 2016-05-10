@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "931307648741",
+    "project_id": "superb-garden-129514"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:931307648741:android:2a24dbd45bdbc7cc",
+        "android_client_info": {
+          "package_name": "bluescreen1.vector"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgEwlJvSX1Jew18m90u4K-ijIoXQHmkss"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
