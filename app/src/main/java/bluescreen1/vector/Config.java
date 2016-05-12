@@ -9,4 +9,5 @@ public class Config {
     public static String APPLICATION_SERVER_URL = "http://cappy-boshes.c9users.io:8080/";
     public static String LOGIN_URL = APPLICATION_SERVER_URL + "login/";
     public static String REGISTER_URL = APPLICATION_SERVER_URL + "users/";
+    public static String GAME_URL = APPLICATION_SERVER_URL + "games/";
 }

@@ -3,6 +3,18 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/gameplay_title"
+        android:text="Title"
+        android:textSize="30sp"/>
 
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/gameplay_countdown"
+        android:text="3 mins till end"/>
 
 </LinearLayout>

@@ -1,6 +1,9 @@
 package bluescreen1.vector;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -14,31 +17,60 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import bluescreen1.vector.Models.UserEntry;
 
 /**
  * Created by Dane on 3/15/2016.
  */
 public class LoginActivity extends AppCompatActivity{
-
+    final GameDB gameDB = new GameDB(this);
     EditText email_username_et;
     EditText password_et;
     String user;
     String jsonuser = "0";
     Intent main;
     Intent reg;
-
+    SQLiteDatabase db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+        db = gameDB.getWritableDatabase();
+        main = new Intent( this, MainActivity.class);
+        String[] projection = {
+                UserEntry.COLUMN_NAME_USER_ID
+        };
+
+
+        String sortOrder =
+                UserEntry.COLUMN_NAME_USER_ID + " DESC";
+
+        Cursor c = db.query(
+                UserEntry.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+
+        if(c.getCount() == 1){
+            startActivity(main);
+            finish();
+        }
         Button login = (Button) findViewById(R.id.login_login_button);
         Button signup = (Button) findViewById(R.id.login_signup_button);
         email_username_et = (EditText) findViewById(R.id.login_username_email);
         password_et = (EditText) findViewById(R.id.login_password);
 
-        main = new Intent( this, MainActivity.class);
+
         reg = new Intent( this, SignUpActivity.class);
         RadioGroup user_rg = (RadioGroup) findViewById(R.id.login_user_radio_group);
         user_rg.check(R.id.login_player_radio);
@@ -47,7 +79,6 @@ public class LoginActivity extends AppCompatActivity{
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 user = getChecked(group);
-                toastit(user);
             }
         });
 
@@ -98,22 +129,32 @@ public class LoginActivity extends AppCompatActivity{
         }
     }
 
-    private boolean login(String email, String password) {
+    private boolean savetodb(JSONObject juser) {
 //        if(email=="user" && password == "pass") {
 //            return true;
 //        } else {
 //            return false;
 //        }
-        loginUser(email, password);
-        while (jsonuser.equals("0")) {
-            if (!jsonuser.equals("-1")) {
-                return true;
-            } else{
-                return false;
-            }
+        ContentValues values = new ContentValues();
+        try {
+            values.put(UserEntry.COLUMN_NAME_USER_ID, juser.getInt("id") );
+            values.put(UserEntry.COLUMN_NAME_TOKEN, juser.getString("auth_token") );
+            values.put(UserEntry.COLUMN_NAME_FIRSTNAME, juser.getString("first_name") );
+            values.put(UserEntry.COLUMN_NAME_LASTNAME, juser.getString("last_name") );
+            values.put(UserEntry.COLUMN_NAME_TYPE, user);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        jsonuser = "0";
-        return email.equals("user") && password.equals("pass");
+
+
+// Insert the new row, returning the primary key value of the new row
+        long newRowId;
+        newRowId = db.insert(
+                UserEntry.TABLE_NAME,
+                null,
+                values);
+        return true;
 
     }
 
@@ -129,8 +170,15 @@ public class LoginActivity extends AppCompatActivity{
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Toast.makeText(LoginActivity.this,response,Toast.LENGTH_LONG).show();
                         jsonuser = response;
+                        try {
+                            JSONObject j = new JSONObject(jsonuser);
+                            main.putExtra("userid", j.getInt("id"));
+                            Toast.makeText(LoginActivity.this,response,Toast.LENGTH_LONG).show();
+                            savetodb(j);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                         startActivity(main);
                         finish();
 
