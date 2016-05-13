@@ -32,16 +32,19 @@ public class LoginActivity extends AppCompatActivity{
     final GameDB gameDB = new GameDB(this);
     EditText email_username_et;
     EditText password_et;
-    String user;
+    int user;
     String jsonuser = "0";
     Intent main;
     Intent reg;
     SQLiteDatabase db;
+    RadioGroup user_rg;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         db = gameDB.getWritableDatabase();
+
         main = new Intent( this, MainActivity.class);
         String[] projection = {
                 UserEntry.COLUMN_NAME_USER_ID
@@ -72,9 +75,9 @@ public class LoginActivity extends AppCompatActivity{
 
 
         reg = new Intent( this, SignUpActivity.class);
-        RadioGroup user_rg = (RadioGroup) findViewById(R.id.login_user_radio_group);
+        user_rg = (RadioGroup) findViewById(R.id.login_user_radio_group);
         user_rg.check(R.id.login_player_radio);
-        user = getChecked(user_rg);
+        user=1;
         user_rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -117,36 +120,36 @@ public class LoginActivity extends AppCompatActivity{
         });
     }
 
-    private String getChecked(RadioGroup rg) {
+    private int getChecked(RadioGroup rg) {
         int rid = rg.getCheckedRadioButtonId();
         switch(rid){
             case R.id.login_creator_radio:
-                return "Creator";
+                main.putExtra("ptype",2);
+                user=2;
+                return 2;
             case R.id.login_player_radio:
-                return "Player";
+                main.putExtra("ptype",1);
+                user=1;
+                return 1;
             default:
-                return "Player";
+                return 1;
         }
     }
 
     private boolean savetodb(JSONObject juser) {
-//        if(email=="user" && password == "pass") {
-//            return true;
-//        } else {
-//            return false;
-//        }
+
         ContentValues values = new ContentValues();
         try {
             values.put(UserEntry.COLUMN_NAME_USER_ID, juser.getInt("id") );
             values.put(UserEntry.COLUMN_NAME_TOKEN, juser.getString("auth_token") );
-            values.put(UserEntry.COLUMN_NAME_FIRSTNAME, juser.getString("first_name") );
-            values.put(UserEntry.COLUMN_NAME_LASTNAME, juser.getString("last_name") );
-            values.put(UserEntry.COLUMN_NAME_TYPE, user);
+            values.put(UserEntry.COLUMN_NAME_FIRSTNAME, juser.getString("firstname") );
+            values.put(UserEntry.COLUMN_NAME_LASTNAME, juser.getString("lastname") );
+            user = getChecked(user_rg);
+            values.put(UserEntry.COLUMN_NAME_TYPE, ""+user);
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
 
 // Insert the new row, returning the primary key value of the new row
         long newRowId;
@@ -165,7 +168,7 @@ public class LoginActivity extends AppCompatActivity{
     }
 
     private void loginUser(final String email, final String password){
-
+        user = getChecked(user_rg);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Config.LOGIN_URL,
                 new Response.Listener<String>() {
                     @Override
@@ -174,7 +177,7 @@ public class LoginActivity extends AppCompatActivity{
                         try {
                             JSONObject j = new JSONObject(jsonuser);
                             main.putExtra("userid", j.getInt("id"));
-                            Toast.makeText(LoginActivity.this,response,Toast.LENGTH_LONG).show();
+//                            Toast.makeText(LoginActivity.this,response,Toast.LENGTH_LONG).show();
                             savetodb(j);
                         } catch (JSONException e) {
                             e.printStackTrace();

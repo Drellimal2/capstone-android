@@ -22,7 +22,9 @@
         <ListView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/home_user_games"/>
+            android:id="@+id/home_user_games"
+            android:dividerHeight="2dp"
+            android:divider="@color/white"/>
 
     </LinearLayout>
 

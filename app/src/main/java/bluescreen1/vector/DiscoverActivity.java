@@ -5,37 +5,43 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonArrayRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import bluescreen1.vector.Models.UserEntry;
 
-public class MainActivity extends AppCompatActivity {
-
+/**
+ * Created by Dane on 5/11/2016.
+ */
+public class DiscoverActivity extends AppCompatActivity {
     GameAdapter gameAdapter;
     ListView gamelistview;
     int userid;
-    String token;
-    String ptype;
+    EditText searchbar;
+    ArrayList<JSONObject> jobj;
 
+    String token;
 
     protected void setData(){
         final GameDB gameDB = new GameDB(this);
@@ -56,72 +62,63 @@ public class MainActivity extends AppCompatActivity {
         c.moveToFirst();
         userid = c.getInt(0);
         token = c.getString(1);
-        ptype = c.getString(4);
-        toastit(ptype);
     }
 
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        getData(userid);
-    }
-
-    protected void logout(){
-        final GameDB gameDB = new GameDB(this);
-        SQLiteDatabase db = gameDB.getWritableDatabase();
-
-        String selection = UserEntry.COLUMN_NAME_USER_ID + " = ?";
-// Specify arguments in placeholder order.
-        String[] selectionArgs = { (""+userid) };
-// Issue SQL statement.
-        db.delete(UserEntry.TABLE_NAME, selection, selectionArgs);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.mygames);
-        setData();
-        final Intent discover = new Intent(this, DiscoverActivity.class);
-        final Intent newgame = new Intent(this, NewGameActivity.class);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(ptype.equals("1")) {
-                    startActivity(discover);
-                } else {
-                    startActivity(newgame);
+    private void search(){
+        String term = searchbar.getText().toString();
+        toastit("" + jobj.size());
+        ArrayList<JSONObject> newjobj = new ArrayList<>();
+        if (term.trim().equals("")){
+            toastit("Enter a term.");
+        } else {
+            for (JSONObject j : (ArrayList<JSONObject>)jobj.clone()){
+                try {
+                    if (j.getString("name").toLowerCase().contains(term.toLowerCase().trim())){
+                        newjobj.add(j);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            }
+            gameAdapter.clear();
+            gameAdapter.addAll(newjobj);
+            gameAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.search_activity);
+        setData();
+        gamelistview = (ListView) findViewById(R.id.available_games);
+        final Intent details = new Intent(this, DetailsActivity.class);
+        searchbar = (EditText) findViewById(R.id.search_activity_bar);
+        Button searchButton = (Button) findViewById(R.id.search_activity_search_button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                search();
             }
         });
-        gamelistview = (ListView) findViewById(R.id.home_user_games);
-        final Intent details = new Intent(this, DetailsActivity.class);
-        final Intent creator_details = new Intent(this, GamesActivity.class);
-//        int userid = getIntent().getExtras().getInt("userid");
-        getData(userid);
         gamelistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 JSONObject game = gameAdapter.getItem(position);
-                //
-                if(ptype.equals("1")) {
+                try {
+//
+                    toastit(""+game.getInt("id"));
                     details.putExtra("game", game.toString());
-                    details.putExtra("in", 1);
+                    details.putExtra("in",0);
                     startActivity(details);
-                } else {
-                    creator_details.putExtra("game", game.toString());
-                    startActivity(creator_details);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
         });
-    }
+        getData(userid);
 
-    public void updateMessage(String deviceToken){
-        Toast.makeText(this, deviceToken, Toast.LENGTH_LONG).show();
     }
 
     private void toastit(String text){
@@ -130,23 +127,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getData(int userid){
-        String url = Config.GAME_URL;
-        if (ptype.equals("1")) {
-            url = Config.APPLICATION_SERVER_URL + "users/" + userid + "/games/";
-        } else {
-            url = Config.APPLICATION_SERVER_URL + "users/" + userid + "/created_games/";
-        }
-
+        String url = Config.APPLICATION_SERVER_URL + "games?available=true";
         final Context context= this;
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(url, null,
-                new Response.Listener<JSONObject>() {
+        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(url,
+                new Response.Listener<JSONArray>() {
                     @Override
-                    public void onResponse(JSONObject jsonObject) {
-                        JSONArray ja = null;
-                        ArrayList<JSONObject> jobj = new ArrayList<>();
+                    public void onResponse(JSONArray ja) {
+                       jobj = new ArrayList<>();
                         try {
-                            ja = jsonObject.getJSONArray("message");
+
+                            toastit(""+ja.length());
                             for( int x = 0; x < ja.length(); x++){
                                 jobj.add(ja.getJSONObject(x));
                             }
@@ -162,19 +153,33 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("Error: ", error.getMessage());
+                error.printStackTrace();
             }
-        });
+        }){
+            @Override
+            public Map<String, String> getHeaders(){
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "Token token="+token);
+
+                return params;
+            }
+        };
 
         VectorApplication vapp = VectorApplication.getInstance();
         vapp.addToRequestQueue(jsonObjectRequest);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_games, menu);
         return true;
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        getData(userid);
     }
 
     @Override
@@ -195,7 +200,17 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    protected void logout(){
+        final GameDB gameDB = new GameDB(this);
+        SQLiteDatabase db = gameDB.getWritableDatabase();
+
+        String selection = UserEntry.COLUMN_NAME_USER_ID + " = ?";
+// Specify arguments in placeholder order.
+        String[] selectionArgs = { (""+userid) };
+// Issue SQL statement.
+        db.delete(UserEntry.TABLE_NAME, selection, selectionArgs);
+    }
+
 }
-
-
 

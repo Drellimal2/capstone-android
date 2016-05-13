@@ -62,13 +62,11 @@
         <activity android:name=".SignUpActivity" />
         <activity android:name=".DetailsActivity" />
         <activity android:name=".GamePlayActivity" />
-        <activity
-            android:name=".GamesActivity"
+        <activity android:name=".DiscoverActivity" />
+        <activity android:name=".NewGameActivity"
+            android:label="New Game"/>
+        <activity android:name=".GamesActivity"
             android:label="@string/title_activity_games"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".HomeActivity"
-            android:label="@string/title_activity_home"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 

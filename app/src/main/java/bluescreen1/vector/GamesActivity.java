@@ -1,42 +1,87 @@
 package bluescreen1.vector;
 
-import android.support.design.widget.TabLayout;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import bluescreen1.vector.Models.UserEntry;
 
 public class GamesActivity extends AppCompatActivity {
 
-
+    String game;
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
-
+    FloatingActionButton fab;
     private ViewPager mViewPager;
+    int userid;
+    String token;
+    String ptype;
+    JSONObject jgame;
+
+    protected void setData(){
+        final GameDB gameDB = new GameDB(this);
+        SQLiteDatabase db = gameDB.getWritableDatabase();
+        String sortOrder =
+                UserEntry.COLUMN_NAME_USER_ID + " DESC";
+
+        Cursor c = db.query(
+                UserEntry.TABLE_NAME,  // The table to query
+                UserEntry.COLUMNS,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+
+        c.moveToFirst();
+        userid = c.getInt(0);
+        token = c.getString(1);
+        ptype = c.getString(4);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_games);
-
+        setData();
+        game = getIntent().getStringExtra("game");
+        try {
+            jgame = new JSONObject(game);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        GameDetailsFragment gd = GameDetailsFragment.newInstance(game);
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), gd);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -45,7 +90,7 @@ public class GamesActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,23 +124,58 @@ public class GamesActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        GameDetailsFragment gd;
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        public SectionsPagerAdapter(FragmentManager fm, GameDetailsFragment g) {
+            super(fm);
+            gd=g;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            // getItem is called to instantiate the fragment for the given page.
+            // Return a PlaceholderFragment (defined as a static inner class below).
+            if (position == 0){
+                fab.setVisibility(View.GONE);
+                return gd;
+
+            }else {
+                fab.setVisibility(View.VISIBLE);
+            }
+            return PlaceholderFragment.newInstance(position + 1);
+        }
+
+        @Override
+        public int getCount() {
+            // Show 3 total pages.
+            return 2;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "Details";
+                case 1:
+                    return "Clues";
+
+            }
+            return null;
+        }
+    }
+
     public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
+
         private static final String ARG_SECTION_NUMBER = "section_number";
 
         public PlaceholderFragment() {
         }
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
         public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
@@ -114,40 +194,115 @@ public class GamesActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public static class CluesFragment extends Fragment {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
+        private static final String ARG_SECTION_NUMBER = "section_number";
+        private static final String GAME = "game";
+
+        public CluesFragment() {
+        }
+
+        public static CluesFragment newInstance(String game) throws JSONException {
+            CluesFragment fragment = new CluesFragment();
+            Bundle args = new Bundle();
+            JSONObject jgame = new JSONObject(game);
+
+            args.putInt(GAME, jgame.getInt("id"));
+            fragment.setArguments(args);
+            return fragment;
         }
 
         @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
-        }
-
-        @Override
-        public int getCount() {
-            // Show 3 total pages.
-            return 3;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "SECTION 1";
-                case 1:
-                    return "SECTION 2";
-                case 2:
-                    return "SECTION 3";
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.clues, container, false);
+            TextView title = (TextView) rootView.findViewById(R.id.game_details_title);
+            TextView start_time = (TextView) rootView.findViewById(R.id.game_details_start_time);
+            TextView end_time = (TextView) rootView.findViewById(R.id.game_details_end_time);
+            TextView status = (TextView) rootView.findViewById(R.id.game_details_status);
+            Button button = (Button) rootView.findViewById(R.id.game_details_button);
+            button.setVisibility(View.GONE);
+            final TextView countdown = (TextView) rootView.findViewById(R.id.game_details_countdown);
+            TextView desc = (TextView) rootView.findViewById(R.id.game_details_desc);
+            String sgame = getArguments().getString(GAME);
+            Toast.makeText(getActivity(), sgame, Toast.LENGTH_LONG).show();
+            try {
+                JSONObject jgame = new JSONObject(sgame);
+                title.setText(jgame.getString("name"));
+                String start_string = jgame.getString("start_time");
+                String[] start_datetime = start_string.split("T");
+                String start_text = start_datetime[0] + " " +
+                        start_datetime[1].substring(0, start_datetime[1].length()-5);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
+                Date start = dateFormat.parse(start_text);
+                start_time.setText(start.toString());
+                String end_string = jgame.getString("end_time");
+                String[] end_datetime = start_string.split("T");
+                String end_text = start_datetime[0] + " @ " +
+                        end_datetime[1].substring(0, end_datetime[1].length()-5);
+                end_time.setText(end_text);
+                desc.setText(jgame.getString("description"));
+            } catch (JSONException | ParseException e) {
+                e.printStackTrace();
             }
-            return null;
+
+
+            return rootView;
+        }
+    }
+
+    public static class GameDetailsFragment extends Fragment {
+
+        private static final String ARG_SECTION_NUMBER = "section_number";
+        private static final String GAME = "game";
+
+        public GameDetailsFragment() {
+        }
+
+        public static GameDetailsFragment newInstance(String game) {
+            GameDetailsFragment fragment = new GameDetailsFragment();
+            Bundle args = new Bundle();
+            args.putString(GAME, game);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.details_game, container, false);
+            TextView title = (TextView) rootView.findViewById(R.id.game_details_title);
+            TextView start_time = (TextView) rootView.findViewById(R.id.game_details_start_time);
+            TextView end_time = (TextView) rootView.findViewById(R.id.game_details_end_time);
+            TextView status = (TextView) rootView.findViewById(R.id.game_details_status);
+            Button button = (Button) rootView.findViewById(R.id.game_details_button);
+            button.setVisibility(View.GONE);
+            final TextView countdown = (TextView) rootView.findViewById(R.id.game_details_countdown);
+            TextView desc = (TextView) rootView.findViewById(R.id.game_details_desc);
+            String sgame = getArguments().getString(GAME);
+            Toast.makeText(getActivity(), sgame, Toast.LENGTH_LONG).show();
+            try {
+                JSONObject jgame = new JSONObject(sgame);
+                title.setText(jgame.getString("name"));
+                String start_string = jgame.getString("start_time");
+                String[] start_datetime = start_string.split("T");
+                String start_text = start_datetime[0] + " " +
+                        start_datetime[1].substring(0, start_datetime[1].length()-5);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
+                Date start = dateFormat.parse(start_text);
+                start_time.setText(start.toString());
+                String end_string = jgame.getString("end_time");
+                String[] end_datetime = start_string.split("T");
+                String end_text = start_datetime[0] + " @ " +
+                        end_datetime[1].substring(0, end_datetime[1].length()-5);
+                end_time.setText(end_text);
+                desc.setText(jgame.getString("description"));
+            } catch (JSONException | ParseException e) {
+                e.printStackTrace();
+            }
+
+
+            return rootView;
         }
     }
 }
