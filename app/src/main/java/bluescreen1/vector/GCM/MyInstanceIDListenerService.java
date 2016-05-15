@@ -1,4 +1,4 @@
-package bluescreen1.vector;
+package bluescreen1.vector.GCM;
 
 import com.google.android.gms.iid.InstanceIDListenerService;
 

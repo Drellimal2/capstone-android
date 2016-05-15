@@ -26,7 +26,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import bluescreen1.vector.Game.DetailsActivity;
+import bluescreen1.vector.Game.GameAdapter;
+import bluescreen1.vector.Game.GameDB;
+import bluescreen1.vector.Game.NewGameActivity;
 import bluescreen1.vector.Models.UserEntry;
+import bluescreen1.vector.User.DiscoverActivity;
+import bluescreen1.vector.User.LoginActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -187,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
             Intent login = new Intent(this, LoginActivity.class);
             logout();
             startActivity(login);
+            finish();
         }
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {

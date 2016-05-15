@@ -1,4 +1,4 @@
-package bluescreen1.vector;
+package bluescreen1.vector.Game;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -27,7 +27,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import bluescreen1.vector.Config;
+import bluescreen1.vector.GamePlayActivity;
 import bluescreen1.vector.Models.UserEntry;
+import bluescreen1.vector.R;
+import bluescreen1.vector.VectorApplication;
 
 /**
  * Created by Dane on 5/11/2016.
@@ -67,6 +71,8 @@ public class DetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.details_game);
         setData();
+        Intent callingIntent = getIntent();
+        sgame = callingIntent.getStringExtra("game");
         TextView title = (TextView) findViewById(R.id.game_details_title);
         TextView start_time = (TextView) findViewById(R.id.game_details_start_time);
         TextView end_time = (TextView) findViewById(R.id.game_details_end_time);
@@ -74,10 +80,19 @@ public class DetailsActivity extends AppCompatActivity {
         Button button = (Button) findViewById(R.id.game_details_button);
         final TextView countdown = (TextView) findViewById(R.id.game_details_countdown);
         TextView desc = (TextView) findViewById(R.id.game_details_desc);
-        Intent callingIntent = getIntent();
+        Button play = (Button) findViewById(R.id.game_details_play);
+        final Intent playIntent = new Intent(this, GamePlayActivity.class);
+        playIntent.putExtra("GAME", sgame);
+        play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(playIntent);
+            }
+        });
+
         if (callingIntent.hasExtra("game")){
             try {
-                sgame = callingIntent.getStringExtra("game");
+
                 JSONObject game = new JSONObject(sgame);
                 jgame = game;
                 title.setText(game.getString("name"));
@@ -155,7 +170,7 @@ public class DetailsActivity extends AppCompatActivity {
                     public void onResponse(String ja) {
 
                         intent.putExtra("game", sgame);
-                        intent.putExtra("in",1);
+                        intent.putExtra("in",0);
                         startActivity(intent);
                         finish();
 

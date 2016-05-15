@@ -8,6 +8,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import bluescreen1.vector.User.LoginActivity;
+
 public class SplashScreen extends Activity {
     private Intent mainMenuIntent;
 

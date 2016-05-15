@@ -89,4 +89,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/game_details_button"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Game"
+        android:id="@+id/game_details_play"/>
 </LinearLayout>

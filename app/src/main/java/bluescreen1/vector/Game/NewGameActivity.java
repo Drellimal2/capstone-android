@@ -1,4 +1,4 @@
-package bluescreen1.vector;
+package bluescreen1.vector.Game;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -32,7 +32,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import bluescreen1.vector.Config;
+import bluescreen1.vector.User.LoginActivity;
 import bluescreen1.vector.Models.UserEntry;
+import bluescreen1.vector.R;
+import bluescreen1.vector.VectorApplication;
 
 /**
  * Created by Dane on 5/12/2016.

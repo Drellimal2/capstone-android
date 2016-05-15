@@ -1,4 +1,4 @@
-package bluescreen1.vector;
+package bluescreen1.vector.Game;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,6 +12,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import bluescreen1.vector.R;
 
 /**
  * Created by Dane on 5/10/2016.

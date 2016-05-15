@@ -1,4 +1,4 @@
-package bluescreen1.vector;
+package bluescreen1.vector.GCM;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,6 +11,8 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
+
+import bluescreen1.vector.MainActivity;
 
 /**
  * Created by Dane on 5/4/2016.

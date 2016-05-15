@@ -1,4 +1,4 @@
-package bluescreen1.vector;
+package bluescreen1.vector.GCM;
 
 import android.app.Activity;
 import android.util.Log;

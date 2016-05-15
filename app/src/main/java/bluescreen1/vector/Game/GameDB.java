@@ -1,4 +1,4 @@
-package bluescreen1.vector;
+package bluescreen1.vector.Game;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -27,7 +27,7 @@ public class GameDB extends SQLiteOpenHelper {
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + UserEntry.TABLE_NAME;
 
-    GameDB(Context context) {
+    public GameDB(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

@@ -1,4 +1,4 @@
-package bluescreen1.vector;
+package bluescreen1.vector.User;
 
 import android.content.Context;
 import android.content.Intent;
@@ -29,7 +29,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import bluescreen1.vector.Config;
+import bluescreen1.vector.Game.DetailsActivity;
+import bluescreen1.vector.Game.GameAdapter;
+import bluescreen1.vector.Game.GameDB;
 import bluescreen1.vector.Models.UserEntry;
+import bluescreen1.vector.R;
+import bluescreen1.vector.VectorApplication;
 
 /**
  * Created by Dane on 5/11/2016.
@@ -128,6 +134,7 @@ public class DiscoverActivity extends AppCompatActivity {
 
     private void getData(int userid){
         String url = Config.APPLICATION_SERVER_URL + "games?available=true";
+        toastit(url);
         final Context context= this;
 
         JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(url,

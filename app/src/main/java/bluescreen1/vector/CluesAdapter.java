@@ -39,7 +39,7 @@ public class CluesAdapter  extends ArrayAdapter<JSONObject> {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.game_item, parent, false);
+            convertView = inflater.inflate(R.layout.clue_item, parent, false);
         }
         TextView id = (TextView) convertView.findViewById(R.id.clue_item_id);
         TextView question = (TextView) convertView.findViewById(R.id.clue_item_question);
@@ -47,10 +47,10 @@ public class CluesAdapter  extends ArrayAdapter<JSONObject> {
         TextView hint = (TextView) convertView.findViewById(R.id.clue_item_hint);
 
         try {
-            id.setText(a.get("id").toString());
-            question.setText(a.get("question").toString());
-            answer.setText(a.get("answer").toString());
-            hint.setText(a.get("hint").toString());
+            id.setText(""+a.getInt("id"));
+            question.setText(a.getString("question"));
+            answer.setText(a.getString("answer"));
+            hint.setText(a.getString("hint"));
         } catch (JSONException e) {
             e.printStackTrace();
             Toast.makeText(context, "OH WELL"+ position, Toast.LENGTH_LONG ).show();

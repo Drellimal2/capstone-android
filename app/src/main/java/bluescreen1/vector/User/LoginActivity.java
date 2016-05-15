@@ -1,4 +1,4 @@
-package bluescreen1.vector;
+package bluescreen1.vector.User;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -23,7 +23,12 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import bluescreen1.vector.Config;
+import bluescreen1.vector.Game.GameDB;
+import bluescreen1.vector.MainActivity;
 import bluescreen1.vector.Models.UserEntry;
+import bluescreen1.vector.R;
+import bluescreen1.vector.VectorApplication;
 
 /**
  * Created by Dane on 3/15/2016.

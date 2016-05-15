@@ -1,4 +1,4 @@
-package bluescreen1.vector;
+package bluescreen1.vector.GCM;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -16,6 +16,10 @@ import com.google.android.gms.iid.InstanceID;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import bluescreen1.vector.Config;
+import bluescreen1.vector.MainActivity;
+import bluescreen1.vector.VectorApplication;
 
 /**
  * Created by Dane on 5/4/2016.
