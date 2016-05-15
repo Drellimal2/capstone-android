@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.mygames);
         setData();
         final Intent discover = new Intent(this, DiscoverActivity.class);
-        final Intent newgame = new Intent(this, NewGameActivity.class);
+        final Intent newGame = new Intent(this, NewGameActivity.class);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 if(ptype.equals("1")) {
                     startActivity(discover);
                 } else {
-                    startActivity(newgame);
+                    startActivity(newGame);
                 }
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();

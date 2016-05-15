@@ -1,5 +1,6 @@
 package bluescreen1.vector.Game;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -28,7 +29,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import bluescreen1.vector.Config;
+import bluescreen1.vector.GCM.RegistrationAsyncTask;
 import bluescreen1.vector.GamePlayActivity;
+import bluescreen1.vector.GamesActivity;
 import bluescreen1.vector.Models.UserEntry;
 import bluescreen1.vector.R;
 import bluescreen1.vector.VectorApplication;
@@ -43,6 +46,7 @@ public class DetailsActivity extends AppCompatActivity {
     String sgame;
     String ptype;
     JSONObject jgame;
+    Activity thisActivity = this;
 
     protected void setData(){
         final GameDB gameDB = new GameDB(this);
@@ -208,6 +212,7 @@ public class DetailsActivity extends AppCompatActivity {
                         Log.i("STUDD",ja);
                         intent.putExtra("game", sgame);
                         intent.putExtra("in",1);
+                        new RegistrationAsyncTask(thisActivity).execute();//Send GCM token to the server when you join a game
                         startActivity(intent);
                         finish();
 
