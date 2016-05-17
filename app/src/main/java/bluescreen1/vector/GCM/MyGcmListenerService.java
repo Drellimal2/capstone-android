@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
@@ -30,6 +31,7 @@ public class MyGcmListenerService extends GcmListenerService {
         Log.d("test", data.toString());
         String message = data.getString("message");
         sendNotification(message);
+
     }
 
     /**
@@ -56,5 +58,7 @@ public class MyGcmListenerService extends GcmListenerService {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        Intent registrationComplete = new Intent("ho");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
     }
 }

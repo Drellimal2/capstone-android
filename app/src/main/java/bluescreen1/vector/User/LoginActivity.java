@@ -195,7 +195,9 @@ public class LoginActivity extends AppCompatActivity{
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(LoginActivity.this,error.toString(),Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoginActivity.this,"OOPS Something went wrong check your credentials or internet connection.",Toast.LENGTH_LONG).show();
+                        error.printStackTrace();
+//                        Toast.makeText(Lo)
                         jsonuser = "-1";
                     }
                 }){

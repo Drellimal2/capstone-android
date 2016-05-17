@@ -46,7 +46,6 @@ public class DiscoverActivity extends AppCompatActivity {
     int userid;
     EditText searchbar;
     ArrayList<JSONObject> jobj;
-
     String token;
 
     protected void setData(){
@@ -72,7 +71,7 @@ public class DiscoverActivity extends AppCompatActivity {
 
     private void search(){
         String term = searchbar.getText().toString();
-        toastit("" + jobj.size());
+//        toastit("" + jobj.size());
         ArrayList<JSONObject> newjobj = new ArrayList<>();
         if (term.trim().equals("")){
             toastit("Enter a term.");
@@ -86,6 +85,9 @@ public class DiscoverActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
+//            if(newjobj.size() >= jobj.size()){
+//                jobj = newjobj.clone();
+//            }
             gameAdapter.clear();
             gameAdapter.addAll(newjobj);
             gameAdapter.notifyDataSetChanged();
@@ -111,16 +113,12 @@ public class DiscoverActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 JSONObject game = gameAdapter.getItem(position);
-                try {
-//
-                    toastit(""+game.getInt("id"));
-                    details.putExtra("game", game.toString());
-                    details.putExtra("in",0);
-                    startActivity(details);
+                //
+//                    toastit(""+game.getInt("id"));
+                details.putExtra("game", game.toString());
+                details.putExtra("in",0);
+                startActivity(details);
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
             }
         });
         getData(userid);
@@ -134,7 +132,7 @@ public class DiscoverActivity extends AppCompatActivity {
 
     private void getData(int userid){
         String url = Config.APPLICATION_SERVER_URL + "games?available=true";
-        toastit(url);
+//        toastit(url);
         final Context context= this;
 
         JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(url,

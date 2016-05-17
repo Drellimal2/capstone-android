@@ -11,7 +11,13 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import bluescreen1.vector.R;
 
@@ -22,7 +28,7 @@ public class GameAdapter extends ArrayAdapter<JSONObject> {
 
     private final Context context;
     private final ArrayList<JSONObject> values;
-
+    TextView status;
     public GameAdapter(Context context, ArrayList<JSONObject> objects) {
         super(context, -1, objects);
         this.context = context;
@@ -45,18 +51,65 @@ public class GameAdapter extends ArrayAdapter<JSONObject> {
         }
         TextView id = (TextView) convertView.findViewById(R.id.game_item_id);
         TextView title = (TextView) convertView.findViewById(R.id.game_item_title);
-        TextView status = (TextView) convertView.findViewById(R.id.game_item_status);
+        status = (TextView) convertView.findViewById(R.id.game_item_status);
         TextView starttime = (TextView) convertView.findViewById(R.id.game_item_start_time);
 
         try {
             id.setText(a.get("id").toString());
             title.setText(a.get("name").toString());
+            String start_string = a.getString("start_time");
+
+            String[] start_datetime = start_string.split("T");
+            String start_text = start_datetime[0] + " " +
+                    start_datetime[1].substring(0, start_datetime[1].length()-5);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
+            Date start = dateFormat.parse(start_text);
+            Calendar calendar = Calendar.getInstance();
+            DateFormat df = DateFormat.getDateTimeInstance();
+
+            calendar.setTime(start);
+            calendar.add(Calendar.HOUR_OF_DAY, -5);
+            starttime.setText(df.format(calendar.getTime()));
+            status.setText(getstatus(start_string, a.getString("end_time")));
         } catch (JSONException e) {
             e.printStackTrace();
             Toast.makeText(context, "OH WELL"+ position, Toast.LENGTH_LONG ).show();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
         // change the icon for Windows and iPhone
         return convertView;
+    }
+
+    protected String getstatus(String start_string, String end_string){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
+        String[] start_datetime = start_string.split("T");
+        String[] end_datetime = end_string.split("T");
+        String start_text = start_datetime[0] + " " + start_datetime[1].substring(0, start_datetime[1].length()-5);
+        String end_text = end_datetime[0] + " " + end_datetime[1].substring(0, end_datetime[1].length()-5);
+        try {
+            Date start = dateFormat.parse(start_text);
+            Date end = dateFormat.parse(end_text);
+            Date now = new Date();
+            if(start.after(now)){
+                status.setTextColor(context.getResources().getColor(R.color.red));
+                return "NOT STARTED";
+            } else {
+                if(end.after(now)){
+                    status.setTextColor(context.getResources().getColor(R.color.grassgreen));
+
+                    return "RUNNING";
+                } else {
+                    status.setTextColor(context.getResources().getColor(R.color.sand));
+
+                    return "ENDED";
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return "ACTIVE";
+
     }
 }

@@ -65,7 +65,7 @@ public class NewClue extends AppCompatActivity implements
         userid = c.getInt(0);
         token = c.getString(1);
         ptype = c.getString(4);
-        toastit(ptype);
+//        toastit(ptype);
     }
 
 
@@ -106,15 +106,17 @@ public class NewClue extends AppCompatActivity implements
                 Location a = getLock();
                 lat.setText(""+a.getLatitude());
                 lon.setText(""+a.getLongitude());
-                toastit(""+mLastLocation.getLatitude());
+//                toastit(""+mLastLocation.getLatitude());
             }
         });
+
         Button save = (Button) findViewById(R.id.new_clue_save_button);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(validate()){
                     save();
+                    finish();
                 }
             }
         });

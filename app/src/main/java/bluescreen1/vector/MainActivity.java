@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -63,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         userid = c.getInt(0);
         token = c.getString(1);
         ptype = c.getString(4);
-        toastit(ptype);
+//        toastit(ptype);
     }
 
 
@@ -91,7 +90,10 @@ public class MainActivity extends AppCompatActivity {
         setData();
         final Intent discover = new Intent(this, DiscoverActivity.class);
         final Intent newGame = new Intent(this, NewGameActivity.class);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        if(ptype.equals("1")) {
+            fab.setImageDrawable(getResources().getDrawable(R.mipmap.ic_search));
+        }
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,8 +102,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     startActivity(newGame);
                 }
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
             }
         });
         gamelistview = (ListView) findViewById(R.id.home_user_games);

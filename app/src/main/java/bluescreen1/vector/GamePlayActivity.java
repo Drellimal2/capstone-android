@@ -1,13 +1,18 @@
 package bluescreen1.vector;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,16 +41,20 @@ import bluescreen1.vector.Models.UserEntry;
 
 import static java.lang.Math.toRadians;
 
+
 /**
  * Created by Dane on 5/11/2016.
  */
 public class GamePlayActivity extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, ClueSolverDialog.NoticeDialogListener {
-
+    GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, ClueSolverDialog.NoticeDialogListener {
+    private boolean isReceiverRegistered;
+    private BroadcastReceiver broadcastReceiver;
     int userid;
     String token;
     String ptype;
+    JSONObject closest_clue;
     String game;
+    double closestClue =100000000;
     String gtitle;
     JSONObject jgame;
     int game_id;
@@ -55,7 +64,7 @@ public class GamePlayActivity extends AppCompatActivity implements
     protected LocationRequest mLocationRequest;
     TextView title, countdown;
 
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 6000;
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 2000;
 
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
             UPDATE_INTERVAL_IN_MILLISECONDS / 2;
@@ -68,7 +77,6 @@ public class GamePlayActivity extends AppCompatActivity implements
 
 
         final Context context= this;
-        Toast.makeText(context, url, Toast.LENGTH_LONG).show();
         JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(url,
                 new Response.Listener<JSONArray>() {
                     @Override
@@ -100,17 +108,45 @@ public class GamePlayActivity extends AppCompatActivity implements
     }
 
     private void check_clues(Location location){
+        LinearLayout indicator = (LinearLayout) findViewById(R.id.gameplay_indicator);
         for(JSONObject clue: clues){
-            toastit(""+ hav(location, clue ));
-            if (hav(location, clue ) < 6.0){
-                confirmFireMissiles(clue);
+            double clueDist = hav(location, clue );
+            if(clueDist <= closestClue){
+                closestClue = clueDist;
+                closest_clue = clue;
+            }
+            if ( clueDist < 6.0){
+
                 try {
-                    toastit("" +clue.getInt("id"));
+                    Log.i("CLUE", "" +clue.getInt("id"));
+
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         }
+        if(closestClue > 50){
+            indicator.setBackgroundColor(getResources().getColor(R.color.ice_cold));
+        }
+
+        if(closestClue > 40){
+            indicator.setBackgroundColor(getResources().getColor(R.color.cold));
+        }
+
+        if(closestClue > 30){
+            indicator.setBackgroundColor(getResources().getColor(R.color.cool));
+        }
+        if(closestClue > 20){
+            indicator.setBackgroundColor(getResources().getColor(R.color.warm));
+        }
+        if(closestClue > 10){
+            indicator.setBackgroundColor(getResources().getColor(R.color.hot));
+        }
+        if(closestClue > 50){
+            indicator.setBackgroundColor(getResources().getColor(R.color.sun_hot));
+        }
+        confirmFireMissiles(closest_clue);
     }
 
     private void toastit(String text){
@@ -189,7 +225,6 @@ public class GamePlayActivity extends AppCompatActivity implements
         mGoogleApiClient.connect();
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -200,6 +235,13 @@ public class GamePlayActivity extends AppCompatActivity implements
         title.setText(gtitle);
         getData();
         buildGoogleApiClient();
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                countdown.setText("hi");
+            }
+        };
+        registerReceiver();
 
 
     }
@@ -227,7 +269,7 @@ public class GamePlayActivity extends AppCompatActivity implements
 
     @Override
     public void onConnected(Bundle bundle) {
-        toastit("STARTED");
+//        toastit("STARTED");
         startLocationUpdates();
 
     }
@@ -252,7 +294,7 @@ public class GamePlayActivity extends AppCompatActivity implements
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;
-        countdown.setText(location.getLongitude() + ", " + location.getLatitude());
+//        countdown.setText(location.getLongitude() + ", " + location.getLatitude());
 //        toastit(location.getLongitude() + ", " + location.getLatitude());
 
         check_clues(location);
@@ -277,8 +319,6 @@ public class GamePlayActivity extends AppCompatActivity implements
         }
     }
 
-
-
     @Override
     protected void onStop() {
         mGoogleApiClient.disconnect();
@@ -286,11 +326,18 @@ public class GamePlayActivity extends AppCompatActivity implements
         super.onStop();
     }
 
-
     public void confirmFireMissiles(JSONObject clue) {
         DialogFragment newFragment = ClueSolverDialog.newInstance(clue);
         newFragment.show(getSupportFragmentManager(), "missiles");
         stopLocationUpdates();
+    }
+
+    private void registerReceiver(){
+        if(!isReceiverRegistered) {
+            LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
+                    new IntentFilter("ho"));
+            isReceiverRegistered = true;
+        }
     }
 
     protected void discover_clue(int clue_id){
@@ -299,7 +346,8 @@ public class GamePlayActivity extends AppCompatActivity implements
         StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
-                toastit(s);
+//                toastit(s);
+                toastit("Congrats you have claimed this clue;");
                 startLocationUpdates();
             }
         }, new Response.ErrorListener() {
@@ -316,21 +364,27 @@ public class GamePlayActivity extends AppCompatActivity implements
                 return params;
             }
         };
+
+        VectorApplication vapp = VectorApplication.getInstance();
+        vapp.addToRequestQueue(stringRequest);
     }
+
+
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialog, boolean b, int cid) {
         if (b){
-            toastit("hi" + cid);
+//            toastit("Congrats you have claimed this clue;" + cid);
             discover_clue(cid);
         } else {
             toastit("Sorry that answer is incorrect");
-            dialog.show(getSupportFragmentManager(), "retry");
+//            dialog.show(getSupportFragmentManager(), "retry");
 //            startLocationUpdates();
         }
 //            startLocationUpdates();
 
     }
+
 
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {

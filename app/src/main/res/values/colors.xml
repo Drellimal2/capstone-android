@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimaryDark">#8DD35F</color>
+    <color name="colorPrimaryDark">#70bb3f</color>
     <color name="colorPrimary">#0088AA</color>
     <color name="sea_blue">#00988B</color>
+    <color name="vec">#8DD35F</color>
+    <color name="tor">#D1BA5D</color>
+    <color name="border">#5B4D12</color>
     <color name="colorAccent">#00988B</color>
     <color name="white">#FFFFFF</color>
-    <color name="grassgreen">#6Ab03C</color>
+    <color name="grassgreen">#6AB53C</color>
     <color name="dark_grassgreen">#4A9C2C</color>
     <color name="dark_grass_green">#009E6F</color>
     <color name="sand">#F9EDBF</color>
     <color name='dark_sand'>#FFCD88</color>
+    <color name="red">#FF4545</color>
+    <color name="ice_cold">#0000FF</color>
+    <color name="cold">#3333FF</color>
+    <color name="cool">#8888FF</color>
+    <color name="warm">#FF8888</color>
+    <color name="hot">#FF3333</color>
+    <color name="sun_hot">#FF0000</color>
+
 </resources>

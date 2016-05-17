@@ -79,8 +79,7 @@ public class ClueSolverDialog  extends DialogFragment {
         View root = inflater.inflate(R.layout.solve_clue_dialog, null);
         // Inflate and set the layout for the dialog
         TextView question = (TextView) root.findViewById(R.id.solve_clue_question);
-        question.setText(getArguments().getString("question") +
-        getArguments().getInt("cid"));
+        question.setText(getArguments().getString("question"));
         TextView correct_answer = (TextView) root.findViewById(R.id.solve_clue_correct_answer);
         correct_answer.setText(getArguments().getString("answer"));
         final EditText answer = (EditText) root.findViewById(R.id.solve_clue_answer);

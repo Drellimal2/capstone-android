@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -23,7 +22,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -112,8 +110,7 @@ public class GamesActivity extends AppCompatActivity {
                 Intent intent = new Intent(GamesActivity.this, NewClue.class);
                 intent.putExtra("GAME", game);
                 startActivity(intent);
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
             }
         });
 
@@ -230,7 +227,7 @@ public class GamesActivity extends AppCompatActivity {
 
 
             final Context context= getActivity();
-            Toast.makeText(context, url, Toast.LENGTH_LONG).show();
+//            Toast.makeText(context, url, Toast.LENGTH_LONG).show();
             JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(url,
                     new Response.Listener<JSONArray>() {
                         @Override
@@ -286,7 +283,7 @@ public class GamesActivity extends AppCompatActivity {
             clues = (ListView) rootView.findViewById(R.id.game_clues);
             final Context context= getActivity();
 
-            Toast.makeText(getContext(),"" + getArguments().getInt(GAME), Toast.LENGTH_LONG).show();
+//            Toast.makeText(getContext(),"" + getArguments().getInt(GAME), Toast.LENGTH_LONG).show();
 //            cluesAdapter = new CluesAdapter(getActivity(), new ArrayList<JSONObject>());
 //            clues.setAdapter(cluesAdapter);
             getData();
@@ -328,7 +325,7 @@ public class GamesActivity extends AppCompatActivity {
             final TextView countdown = (TextView) rootView.findViewById(R.id.game_details_countdown);
             TextView desc = (TextView) rootView.findViewById(R.id.game_details_desc);
             String sgame = getArguments().getString(GAME);
-            Toast.makeText(getActivity(), sgame, Toast.LENGTH_LONG).show();
+//            Toast.makeText(getActivity(), sgame, Toast.LENGTH_LONG).show();
             try {
                 JSONObject jgame = new JSONObject(sgame);
                 title.setText(jgame.getString("name"));

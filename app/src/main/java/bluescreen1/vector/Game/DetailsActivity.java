@@ -21,8 +21,10 @@ import com.android.volley.toolbox.StringRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -31,7 +33,6 @@ import java.util.Map;
 import bluescreen1.vector.Config;
 import bluescreen1.vector.GCM.RegistrationAsyncTask;
 import bluescreen1.vector.GamePlayActivity;
-import bluescreen1.vector.GamesActivity;
 import bluescreen1.vector.Models.UserEntry;
 import bluescreen1.vector.R;
 import bluescreen1.vector.VectorApplication;
@@ -45,6 +46,8 @@ public class DetailsActivity extends AppCompatActivity {
     String token;
     String sgame;
     String ptype;
+    TextView status;
+    Button play, button;
     JSONObject jgame;
     Activity thisActivity = this;
 
@@ -80,11 +83,12 @@ public class DetailsActivity extends AppCompatActivity {
         TextView title = (TextView) findViewById(R.id.game_details_title);
         TextView start_time = (TextView) findViewById(R.id.game_details_start_time);
         TextView end_time = (TextView) findViewById(R.id.game_details_end_time);
-        TextView status = (TextView) findViewById(R.id.game_details_status);
-        Button button = (Button) findViewById(R.id.game_details_button);
+        status = (TextView) findViewById(R.id.game_details_status);
+
+        button = (Button) findViewById(R.id.game_details_button);
         final TextView countdown = (TextView) findViewById(R.id.game_details_countdown);
         TextView desc = (TextView) findViewById(R.id.game_details_desc);
-        Button play = (Button) findViewById(R.id.game_details_play);
+        play = (Button) findViewById(R.id.game_details_play);
         final Intent playIntent = new Intent(this, GamePlayActivity.class);
         playIntent.putExtra("GAME", sgame);
         play.setOnClickListener(new View.OnClickListener() {
@@ -100,36 +104,48 @@ public class DetailsActivity extends AppCompatActivity {
                 JSONObject game = new JSONObject(sgame);
                 jgame = game;
                 title.setText(game.getString("name"));
-                String start_string = game.getString("start_time");
-                String[] start_datetime = start_string.split("T");
-                String start_text = start_datetime[0] + " " +
-                    start_datetime[1].substring(0, start_datetime[1].length()-5);
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
-                Date start = dateFormat.parse(start_text);
-                start_time.setText(start.toString());
-
-//                String end_string = game.getString("start_time");
-//                String[] end_datetime = start_string.split("T");
-//                String end_text = start_datetime[0] + " @ " +
-//                        end_datetime[1].substring(0, end_datetime[1].length()-5);
+                final String start_string = game.getString("start_time");
+                start_time.setText(get_date(start_string));
+                final String end_string = game.getString("end_time");
+                end_time.setText(get_date(end_string));
                 long time = new Date().getTime();
-                long dif = start.getTime() - time;
+                String sstatus = getstatus(start_string, end_string);
+                status.setText(sstatus);
+                Date d = new Date();
+                String ending = "";
+                if(sstatus.equals("NOT STARTED")){
+                    d = get_date_d(start_string);
+
+                    ending = " till start";
+                } else if (sstatus.equals("RUNNING")){
+                    d = get_date_d(end_string);
+                    ending = " till end";
+                } else {
+                    countdown.setVisibility(View.GONE);
+                }
+                long dif = d.getTime() - time;
+                final String finalEnding = ending;
                 new CountDownTimer(dif, 1000) {
                     @Override
                     public void onTick(long millisUntilFinished) {
-                        countdown.setText("" + millisUntilFinished/1000);
+                        long secs = millisUntilFinished/1000;
+                        long mins = secs/60;
+                        secs %= 60;
+                        long hours = mins/60;
+                        mins %= 60;
+                        countdown.setText(String.format(" %02d : %02d : %02d ", hours, mins, secs)+ finalEnding);
+
                     }
 
                     @Override
                     public void onFinish() {
                         countdown.setText("Its Time");
+                        getstatus(start_string, end_string);
                     }
                 }.start();
-                end_time.setText(game.getString("end_time"));
+
                 desc.setText(game.getString("description"));
             } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
@@ -149,6 +165,7 @@ public class DetailsActivity extends AppCompatActivity {
 
         } else {
             button.setText("Join Game");
+            play.setVisibility(View.GONE);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -228,7 +245,7 @@ public class DetailsActivity extends AppCompatActivity {
         }){
             @Override
             public Map<String, String> getHeaders(){
-                Map<String, String>  params = new HashMap<String, String>();
+                Map<String, String>  params = new HashMap<>();
                 params.put("Authorization", "Token token="+token);
 
                 return params;
@@ -237,5 +254,80 @@ public class DetailsActivity extends AppCompatActivity {
 
         VectorApplication vapp = VectorApplication.getInstance();
         vapp.addToRequestQueue(jsonObjectRequest);
+    }
+
+    protected String getstatus(String start_string, String end_string){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
+        String[] start_datetime = start_string.split("T");
+        String[] end_datetime = end_string.split("T");
+        String start_text = start_datetime[0] + " " + start_datetime[1].substring(0, start_datetime[1].length()-5);
+        String end_text = end_datetime[0] + " " + end_datetime[1].substring(0, end_datetime[1].length()-5);
+        try {
+            Date start = dateFormat.parse(start_text);
+            Date end = dateFormat.parse(end_text);
+            Date now = new Date();
+            if(start.after(now)){
+                status.setTextColor(getResources().getColor(R.color.red));
+                play.setVisibility(View.GONE);
+                return "NOT STARTED";
+            } else {
+                if(end.after(now)){
+                    status.setTextColor(getResources().getColor(R.color.grassgreen));
+
+                    return "RUNNING";
+                } else {
+                    status.setTextColor(getResources().getColor(R.color.sand));
+                    play.setVisibility(View.GONE);
+                    button.setVisibility(View.GONE);
+                    play.setEnabled(false);
+                    return "ENDED";
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return "ACTIVE";
+
+    }
+
+    protected String get_date(String date){
+
+
+        String[] date_datetime = date.split("T");
+        String date_text = date_datetime[0] + " " +
+                date_datetime[1].substring(0, date_datetime[1].length()-5);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
+        Date start = new Date();
+        try {
+            start = dateFormat.parse(date_text);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Calendar calendar = Calendar.getInstance();
+        DateFormat df = DateFormat.getDateTimeInstance();
+
+        calendar.setTime(start);
+        calendar.add(Calendar.HOUR_OF_DAY, -5);
+        return df.format(calendar.getTime());
+    }
+
+    protected Date get_date_d(String date){
+
+        String[] date_datetime = date.split("T");
+        String date_text = date_datetime[0] + " " +
+                date_datetime[1].substring(0, date_datetime[1].length()-5);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
+        Date start = new Date();
+        try {
+            start = dateFormat.parse(date_text);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Calendar calendar = Calendar.getInstance();
+        DateFormat df = DateFormat.getDateTimeInstance();
+
+        calendar.setTime(start);
+        calendar.add(Calendar.HOUR_OF_DAY, -5);
+        return calendar.getTime();
     }
 }

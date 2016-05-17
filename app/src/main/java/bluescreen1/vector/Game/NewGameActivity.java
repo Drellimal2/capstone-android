@@ -74,7 +74,7 @@ public class NewGameActivity extends AppCompatActivity {
         userid = c.getInt(0);
         token = c.getString(1);
         ptype = c.getString(4);
-        toastit(ptype);
+//        toastit(ptype);
     }
 
 
@@ -255,7 +255,9 @@ public class NewGameActivity extends AppCompatActivity {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        toastit(response.toString());
+//                        toastit(response.toString());
+                        finish();
+
                         // TODO attach token to register;
                     }
                 }, new Response.ErrorListener() {
@@ -325,6 +327,7 @@ public class NewGameActivity extends AppCompatActivity {
                 if(validation()){
                     makeGame();
                 }
+
             }
         });
 
