@@ -88,28 +88,43 @@ public class GameAdapter extends ArrayAdapter<JSONObject> {
         String[] end_datetime = end_string.split("T");
         String start_text = start_datetime[0] + " " + start_datetime[1].substring(0, start_datetime[1].length()-5);
         String end_text = end_datetime[0] + " " + end_datetime[1].substring(0, end_datetime[1].length()-5);
-        try {
-            Date start = dateFormat.parse(start_text);
-            Date end = dateFormat.parse(end_text);
-            Date now = new Date();
-            if(start.after(now)){
-                status.setTextColor(context.getResources().getColor(R.color.red));
-                return "NOT STARTED";
+        Date start = get_date_d(start_string);
+        Date end = get_date_d(end_string);
+        Date now = new Date();
+        if(start.after(now)){
+            status.setTextColor(context.getResources().getColor(R.color.red));
+            return "NOT STARTED";
+        } else {
+            if(end.after(now)){
+                status.setTextColor(context.getResources().getColor(R.color.grassgreen));
+
+                return "RUNNING";
             } else {
-                if(end.after(now)){
-                    status.setTextColor(context.getResources().getColor(R.color.grassgreen));
+                status.setTextColor(context.getResources().getColor(R.color.sand));
 
-                    return "RUNNING";
-                } else {
-                    status.setTextColor(context.getResources().getColor(R.color.sand));
-
-                    return "ENDED";
-                }
+                return "ENDED";
             }
+        }
+
+    }
+
+    protected Date get_date_d(String date){
+
+        String[] date_datetime = date.split("T");
+        String date_text = date_datetime[0] + " " +
+                date_datetime[1].substring(0, date_datetime[1].length()-5);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
+        Date start = new Date();
+        try {
+            start = dateFormat.parse(date_text);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return "ACTIVE";
+        Calendar calendar = Calendar.getInstance();
+        DateFormat df = DateFormat.getDateTimeInstance();
 
+        calendar.setTime(start);
+        calendar.add(Calendar.HOUR_OF_DAY, -5);
+        return calendar.getTime();
     }
 }

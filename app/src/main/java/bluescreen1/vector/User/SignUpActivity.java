@@ -1,6 +1,8 @@
 package bluescreen1.vector.User;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -13,13 +15,16 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import bluescreen1.vector.Config;
+import bluescreen1.vector.Game.GameDB;
 import bluescreen1.vector.MainActivity;
+import bluescreen1.vector.Models.UserEntry;
 import bluescreen1.vector.R;
 import bluescreen1.vector.VectorApplication;
 
@@ -34,13 +39,16 @@ public class SignUpActivity extends AppCompatActivity {
     EditText name;
     String user;
     String jsonuser = "0";
+    final GameDB gameDB = new GameDB(this);
     Intent main;
+    SQLiteDatabase db;
+
     Intent login;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        db = gameDB.getWritableDatabase();
         setContentView(R.layout.activity_sign_up);
         Button cancel = (Button) findViewById(R.id.signup_cancel_button);
         final Button signup = (Button) findViewById(R.id.signup_signup_button);
@@ -143,6 +151,7 @@ public class SignUpActivity extends AppCompatActivity {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        savetodb(response);
                         Toast.makeText(SignUpActivity.this,response.toString(),Toast.LENGTH_LONG).show();
                         startActivity(main);
                         // TODO attach token to register;
@@ -157,6 +166,31 @@ public class SignUpActivity extends AppCompatActivity {
 
         VectorApplication vapp = VectorApplication.getInstance();
         vapp.addToRequestQueue(jsonObjectRequest);
+    }
+
+    private boolean savetodb(JSONObject juser) {
+
+        ContentValues values = new ContentValues();
+        try {
+            values.put(UserEntry.COLUMN_NAME_USER_ID, juser.getInt("id") );
+            values.put(UserEntry.COLUMN_NAME_TOKEN, juser.getString("auth_token") );
+            values.put(UserEntry.COLUMN_NAME_FIRSTNAME, juser.getString("firstname") );
+            values.put(UserEntry.COLUMN_NAME_LASTNAME, juser.getString("lastname") );
+            user = ""+1;
+            values.put(UserEntry.COLUMN_NAME_TYPE, ""+user);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+// Insert the new row, returning the primary key value of the new row
+        long newRowId;
+        newRowId = db.insert(
+                UserEntry.TABLE_NAME,
+                null,
+                values);
+        return true;
+
     }
 
 }

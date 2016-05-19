@@ -262,31 +262,29 @@ public class DetailsActivity extends AppCompatActivity {
         String[] end_datetime = end_string.split("T");
         String start_text = start_datetime[0] + " " + start_datetime[1].substring(0, start_datetime[1].length()-5);
         String end_text = end_datetime[0] + " " + end_datetime[1].substring(0, end_datetime[1].length()-5);
-        try {
-            Date start = dateFormat.parse(start_text);
-            Date end = dateFormat.parse(end_text);
-            Date now = new Date();
-            if(start.after(now)){
-                status.setTextColor(getResources().getColor(R.color.red));
+        //            Date start = dateFormat.parse(start_text);
+        Date start= get_date_d(start_string);
+        Date end = get_date_d(end_string);
+//            Date end = dateFormat.parse(end_text);
+        Date now = new Date();
+        if(start.after(now)){
+            status.setTextColor(getResources().getColor(R.color.red));
                 play.setVisibility(View.GONE);
-                return "NOT STARTED";
-            } else {
-                if(end.after(now)){
-                    status.setTextColor(getResources().getColor(R.color.grassgreen));
+            return "NOT STARTED";
+        } else {
+            if(end.after(now)){
+                status.setTextColor(getResources().getColor(R.color.grassgreen));
 
-                    return "RUNNING";
-                } else {
-                    status.setTextColor(getResources().getColor(R.color.sand));
-                    play.setVisibility(View.GONE);
-                    button.setVisibility(View.GONE);
-                    play.setEnabled(false);
-                    return "ENDED";
-                }
+                return "RUNNING";
+            } else {
+                status.setTextColor(getResources().getColor(R.color.sand));
+                play.setVisibility(View.GONE);
+                button.setVisibility(View.GONE);
+                play.setEnabled(false);
+                return "ENDED";
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
-        return "ACTIVE";
+//        return "ACTIVE";
 
     }
 
